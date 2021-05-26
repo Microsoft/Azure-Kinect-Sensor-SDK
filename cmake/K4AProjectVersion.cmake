@@ -12,7 +12,10 @@ endfunction()
 
 # Set the default version string if it wasn't defined in the build configuration
 if (NOT DEFINED VERSION_STR)
-    set(VERSION_STR "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.0-private")
+    if (NOT PROJECT_VERSION_PATCH)
+        set(PROJECT_VERSION_PATCH 0)
+    endif()
+    set(VERSION_STR "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-private")
 endif()
 
 set(SEMVER_REGEX "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(\\-([a-zA-Z0-9\\._]+))?(\\+([a-zA-Z0-9\\._]+))?$")
@@ -36,7 +39,7 @@ set(K4A_VERSION_MAJOR ${CMAKE_MATCH_1})
 set(K4A_VERSION_MINOR ${CMAKE_MATCH_2})
 set(K4A_VERSION_PATCH ${CMAKE_MATCH_3})
 set(K4A_VERSION_PRERELEASE ${CMAKE_MATCH_5})
-set(K4A_VERSION_BUILDMETADATA ${CMAKE_MATCH_7})
+set(K4A_VERSION_BUILD_METADATA ${CMAKE_MATCH_7})
 set(K4A_VERSION_STR ${VERSION_STR})
 
 if (NOT K4A_VERSION_REVISION)
