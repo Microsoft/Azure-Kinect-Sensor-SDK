@@ -82,7 +82,7 @@ if (-not (Get-Command -Name "tar")) {
 }
 
 # Check for python 3
-if (-not (Get-Command -All -Name "python" | Where-Object { $_.Version -ge [Version]"3.0" }))
+if (-not (Get-Command -All -Name "python3"))
 {
     Write-Error "Unable to find python 3. Please install python3 and add it to your path"
 }
