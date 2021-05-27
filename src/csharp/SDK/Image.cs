@@ -84,6 +84,20 @@ namespace Microsoft.Azure.Kinect.Sensor
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Image"/> class from an existing native handle.
+        /// </summary>
+        /// <param name="takeOwnership">If false, the constructor will take a new reference on the handle.</param>
+        /// <param name="handle">Native handle to a k4a_image_t.</param>
+        /// <remarks>
+        /// Disposing this Image will always release a reference on the handle.
+        /// If <paramref name="takeOwnership"/> is true, the handle may not be owned by any existing Image object.
+        /// </remarks>
+        public Image(bool takeOwnership, IntPtr handle)
+            : this(new NativeMethods.k4a_image_t(takeOwnership, handle))
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class.
         /// </summary>
         /// <param name="handle">Handle to initialize the image from.</param>
@@ -464,6 +478,32 @@ namespace Microsoft.Azure.Kinect.Sensor
                     }
 
                     NativeMethods.k4a_image_set_white_balance(this.handle, checked((uint)value));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the native handle.
+        /// </summary>
+        /// <remarks>This is the value of the k4a_image_t handle of the native library.
+        ///
+        /// This handle value can be used to interoperate with other native libraries that use
+        /// Azure Kinect objects.
+        ///
+        /// When using this handle value, the caller is responsible for ensuring that the
+        /// Image object does not become disposed.</remarks>
+        public IntPtr Handle
+        {
+            get
+            {
+                lock (this)
+                {
+                    if (this.disposedValue)
+                    {
+                        throw new ObjectDisposedException(nameof(Image));
+                    }
+
+                    return this.handle.DangerousGetHandle();
                 }
             }
         }

@@ -818,7 +818,7 @@ K4ARECORD_EXPORT void k4a_playback_data_block_release(k4a_playback_data_block_t 
  *
  * \remarks
  * The first call to k4a_playback_get_next_imu_sample() after k4a_playback_seek_timestamp() will return the first imu
- * sample with a timestamp greter than or equal to the seek time.
+ * sample with a timestamp greater than or equal to the seek time.
  *
  * \remarks
  * The first call to k4a_playback_get_previous_imu_sample() after k4a_playback_seek_timestamp() will return the first

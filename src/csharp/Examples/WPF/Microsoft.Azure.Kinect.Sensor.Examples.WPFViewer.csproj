@@ -159,7 +159,9 @@
       <Link>k4a.pdb</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(K4aBinaryDirectory)\depthengine_2_0.dll">
+    <!-- If the depth engine doesn't exist in the bin directory, it may be available in the PATH .
+         It isn't needed for compilation, but only required at runtime when reading data from a live device. -->
+    <Content Include="$(K4aBinaryDirectory)\depthengine_2_0.dll" Condition="Exists('$(K4aBinaryDirectory)\depthengine_2_0.dll')">
       <Link>depthengine_2_0.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

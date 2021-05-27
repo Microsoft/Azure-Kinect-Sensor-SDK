@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\k4a.props" />
+  
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>dotnetrecording</AssemblyName>
+    
+    <Platforms>x64;x86</Platforms>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>..\..\AzureKinectSensorSDK.ruleset</CodeAnalysisRuleSet>
+    <OutputPath>$(BaseOutputPath)\$(AssemblyName)\</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Record\Microsoft.Azure.Kinect.Sensor.Record.csproj" />
+    <ProjectReference Include="..\..\SDK\Microsoft.Azure.Kinect.Sensor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="..\..\stylecop.json">
+      <Link>stylecop.json</Link>
+    </AdditionalFiles>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="$(K4aBinaryDirectory)\k4a.dll">
+      <Link>k4a.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(K4aBinaryDirectory)\k4a.pdb">
+      <Link>k4a.pdb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(K4aBinaryDirectory)\k4arecord.dll">
+      <Link>k4arecord.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(K4aBinaryDirectory)\k4arecord.pdb">
+      <Link>k4arecord.pdb</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    
+    <!-- If the depth engine doesn't exist in the bin directory, it may be available in the PATH .
+         It isn't needed for compilation, but only required at runtime when reading data from a live device. -->
+    <Content Include="$(K4aBinaryDirectory)\depthengine_2_0.dll" Condition="Exists('$(K4aBinaryDirectory)\depthengine_2_0.dll')">
+      <Link>depthengine_2_0.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

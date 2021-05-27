@@ -92,7 +92,9 @@ namespace Microsoft.Azure.Kinect.Sensor
                             AzureKinectException.ThrowIfNotSuccess(() => NativeMethods.k4a_set_allocator(this.allocateDelegate, this.freeDelegate));
                             this.hooked = true;
                         }
+#pragma warning disable CA1031 // Do not catch general exception types
                         catch (Exception)
+#pragma warning restore CA1031 // Do not catch general exception types
                         {
                             // Don't fail if we can't set the allocator since this code path is called during the global type
                             // initialization. A failure to set the allocator is also not fatal, but will only cause a performance

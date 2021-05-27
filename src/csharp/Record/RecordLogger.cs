@@ -1,5 +1,5 @@
 ﻿//------------------------------------------------------------------------------
-// <copyright file="Logger.cs" company="Microsoft">
+// <copyright file="RecordLogger.cs" company="Microsoft">
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 // </copyright>
@@ -7,21 +7,21 @@
 using System;
 using System.Diagnostics;
 
-namespace Microsoft.Azure.Kinect.Sensor
+namespace Microsoft.Azure.Kinect.Sensor.Record
 {
     /// <summary>
-    /// The Azure Kinect logging system. Enables access to the debug messages from the Azure Kinect device.
+    /// The Azure Kinect logging system. Enables access to the debug messages from the the Azure Kinect Record and Playback API.
     /// </summary>
-    public static class Logger
+    public static class RecordLogger
     {
         private static readonly object SyncRoot = new object();
         private static readonly NativeMethods.k4a_logging_message_cb_t DebugMessageHandler = OnDebugMessage;
-        private static readonly LoggerProvider LoggerProviderValue = new LoggerProvider();
+        private static readonly RecordLoggerProvider LoggerProvider = new RecordLoggerProvider();
         private static bool isInitialized;
 
 #pragma warning disable CA1003 // Use generic event handler instances
         /// <summary>
-        /// Occurs when the Azure Kinect Sensor SDK delivers a debug message.
+        /// Occurs when the Azure Kinect Sensor Record and Playback SDK delivers a debug message.
         /// </summary>
         public static event Action<LogMessage> LogMessage
 #pragma warning restore CA1003 // Use generic event handler instances
@@ -30,9 +30,9 @@ namespace Microsoft.Azure.Kinect.Sensor
             {
                 lock (SyncRoot)
                 {
-                    if (!Logger.isInitialized)
+                    if (!RecordLogger.isInitialized)
                     {
-                        Logger.Initialize();
+                        RecordLogger.Initialize();
                     }
 
                     LogMessageHandlers += value;
@@ -53,35 +53,29 @@ namespace Microsoft.Azure.Kinect.Sensor
         /// <summary>
         /// Gets the interface for reading log messages.
         /// </summary>
-        public static ILoggingProvider LogProvider
-        {
-            get
-            {
-                return Logger.LoggerProviderValue;
-            }
-        }
+        public static ILoggingProvider LogProvider => RecordLogger.LoggerProvider;
 
         /// <summary>
-        /// Initializes the <see cref="Logger"/> class to begin receiving messages from the Azure Kinect Sensor SDK.
+        /// Initializes the <see cref="RecordLogger"/> class to begin receiving messages from the Azure Kinect Sensor SDK.
         /// </summary>
         public static void Initialize()
         {
             lock (SyncRoot)
             {
-                if (Logger.isInitialized)
+                if (RecordLogger.isInitialized)
                 {
                     return;
                 }
 
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_Exit;
                 AppDomain.CurrentDomain.DomainUnload += CurrentDomain_Exit;
-                NativeMethods.k4a_result_t result = NativeMethods.k4a_set_debug_message_handler(DebugMessageHandler, IntPtr.Zero, LogLevel.Trace);
+                NativeMethods.k4a_result_t result = NativeMethods.k4a_record_set_debug_message_handler(DebugMessageHandler, IntPtr.Zero, LogLevel.Trace);
                 if (result != NativeMethods.k4a_result_t.K4A_RESULT_SUCCEEDED)
                 {
                     throw new AzureKinectException("Failed to set the Debug Message Handler");
                 }
 
-                Logger.isInitialized = true;
+                RecordLogger.isInitialized = true;
             }
         }
 
@@ -93,7 +87,7 @@ namespace Microsoft.Azure.Kinect.Sensor
         {
             lock (SyncRoot)
             {
-                if (!Logger.isInitialized)
+                if (!RecordLogger.isInitialized)
                 {
                     return;
                 }
@@ -108,7 +102,7 @@ namespace Microsoft.Azure.Kinect.Sensor
                 ////    throw new AzureKinectException("Failed to set the Debug Message Handler");
                 ////}
 
-                Logger.isInitialized = false;
+                RecordLogger.isInitialized = false;
             }
         }
 
@@ -125,29 +119,29 @@ namespace Microsoft.Azure.Kinect.Sensor
 
         private static void CurrentDomain_Exit(object sender, EventArgs e)
         {
-            NativeMethods.k4a_result_t result = NativeMethods.k4a_set_debug_message_handler(null, IntPtr.Zero, LogLevel.Off);
+            NativeMethods.k4a_result_t result = NativeMethods.k4a_record_set_debug_message_handler(null, IntPtr.Zero, LogLevel.Off);
             if (result != NativeMethods.k4a_result_t.K4A_RESULT_SUCCEEDED)
             {
                 Trace.WriteLine("Failed to close the debug message handler");
             }
         }
 
-        private class LoggerProvider : ILoggingProvider
+        private class RecordLoggerProvider : ILoggingProvider
         {
             public event Action<LogMessage> LogMessage
             {
                 add
                 {
-                    Logger.LogMessage += value;
+                    RecordLogger.LogMessage += value;
                 }
 
                 remove
                 {
-                    Logger.LogMessage -= value;
+                    RecordLogger.LogMessage -= value;
                 }
             }
 
-            public string ProviderName => "Azure Kinect SDK";
+            public string ProviderName => "Azure Kinect Recording SDK";
         }
     }
 }

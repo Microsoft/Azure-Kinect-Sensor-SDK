@@ -14,21 +14,41 @@ namespace Microsoft.Azure.Kinect.Sensor
     /// Represents a tracer for capturing thread specific logging messages for tracing native calls
     /// into the Azure Kinect Sensor SDK.
     /// </summary>
-    internal class LoggingTracer : IDisposable
+    public class LoggingTracer : IDisposable
     {
         private readonly int threadId;
+        private readonly LogLevel minLevel;
 
         private bool disposed;
         private List<LogMessage> messages;
+
+        private ILoggingProvider[] loggingProviders;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LoggingTracer"/> class.
         /// </summary>
         public LoggingTracer()
+            : this(LogLevel.Warning, Logger.LogProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LoggingTracer"/> class.
+        /// </summary>
+        /// <param name="minLevel">Minimum level of messages to capture.</param>
+        /// <param name="loggingProvider">Set of logging providers to capture from.</param>
+        public LoggingTracer(LogLevel minLevel, params ILoggingProvider[] loggingProvider)
         {
             this.messages = new List<LogMessage>();
             this.threadId = Thread.CurrentThread.ManagedThreadId;
-            Logger.LogMessage += this.Logger_LogMessage;
+            this.minLevel = minLevel;
+
+            this.loggingProviders = (ILoggingProvider[])loggingProvider.Clone();
+
+            foreach (ILoggingProvider provider in this.loggingProviders)
+            {
+                provider.LogMessage += this.Logger_LogMessage;
+            }
         }
 
         /// <summary>
@@ -71,7 +91,12 @@ namespace Microsoft.Azure.Kinect.Sensor
             {
                 if (disposing)
                 {
-                    Logger.LogMessage -= this.Logger_LogMessage;
+                    foreach (ILoggingProvider provider in this.loggingProviders)
+                    {
+                        provider.LogMessage -= this.Logger_LogMessage;
+                    }
+
+                    this.loggingProviders = null;
 
                     // There are no longer any tracers on this thread. Clear the message list to allow the memory to be freed.
                     this.messages = null;
@@ -86,6 +111,12 @@ namespace Microsoft.Azure.Kinect.Sensor
             if (this.threadId != Thread.CurrentThread.ManagedThreadId)
             {
                 // The log messages aren't coming from this thread. Ignore them.
+                return;
+            }
+
+            if (logMessage.LogLevel > this.minLevel)
+            {
+                // The log messages are too verbose. Ignore them.
                 return;
             }
 

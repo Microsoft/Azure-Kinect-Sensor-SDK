@@ -168,6 +168,32 @@ namespace Microsoft.Azure.Kinect.Sensor
         }
 
         /// <summary>
+        /// Gets the native handle.
+        /// </summary>
+        /// <remarks>This is the value of the k4a_device_t handle of the native library.
+        ///
+        /// This handle value can be used to interoperate with other native libraries that use
+        /// Azure Kinect objects.
+        ///
+        /// When using this handle value, the caller is responsible for ensuring that the
+        /// Device object does not become disposed.</remarks>
+        public IntPtr Handle
+        {
+            get
+            {
+                lock (this)
+                {
+                    if (this.disposedValue)
+                    {
+                        throw new ObjectDisposedException(nameof(Device));
+                    }
+
+                    return this.handle.DangerousGetHandle();
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the number of currently connected devices.
         /// </summary>
         /// <returns>The number of connected devices.</returns>
@@ -274,7 +300,9 @@ namespace Microsoft.Azure.Kinect.Sensor
                     throw new ObjectDisposedException(nameof(Device));
                 }
 
+#pragma warning disable CA1508 // Avoid dead conditional code
                 using (LoggingTracer tracer = new LoggingTracer())
+#pragma warning restore CA1508 // Avoid dead conditional code
                 {
                     NativeMethods.k4a_wait_result_t result = NativeMethods.k4a_device_get_capture(this.handle, out NativeMethods.k4a_capture_t capture, (int)timeout.TotalMilliseconds);
 
@@ -328,7 +356,9 @@ namespace Microsoft.Azure.Kinect.Sensor
                     throw new ObjectDisposedException(nameof(Device));
                 }
 
+#pragma warning disable CA1508 // Avoid dead conditional code
                 using (LoggingTracer tracer = new LoggingTracer())
+#pragma warning restore CA1508 // Avoid dead conditional code
                 {
                     NativeMethods.k4a_imu_sample_t sample = new NativeMethods.k4a_imu_sample_t();
                     NativeMethods.k4a_wait_result_t result = NativeMethods.k4a_device_get_imu_sample(this.handle, sample, (int)timeout.TotalMilliseconds);
@@ -504,6 +534,27 @@ namespace Microsoft.Azure.Kinect.Sensor
         }
 
         /// <summary>
+        /// Gets the native handle.
+        /// </summary>
+        /// <returns>The native handle that is wrapped by this device.</returns>
+        /// <remarks>The function is dangerous because there is no guarantee that the
+        /// handle will not be disposed once it is retrieved. This should only be called
+        /// by code that can ensure that the Capture object will not be disposed on another
+        /// thread.</remarks>
+        internal NativeMethods.k4a_device_t DangerousGetHandle()
+        {
+            lock (this)
+            {
+                if (this.disposedValue)
+                {
+                    throw new ObjectDisposedException(nameof(Device));
+                }
+
+                return this.handle;
+            }
+        }
+
+        /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
         /// <param name="disposing"><c>True</c> to release both managed and unmanaged resources; <c>False</c> to release only unmanaged resources.</param>
@@ -513,12 +564,17 @@ namespace Microsoft.Azure.Kinect.Sensor
             {
                 if (disposing)
                 {
-                    Allocator.Singleton.UnregisterForDisposal(this);
+                    // Callers of DangerousGetHandle will lock this Device object
+                    // to ensure the handle isn't disposed while in use.
+                    lock (this)
+                    {
+                        Allocator.Singleton.UnregisterForDisposal(this);
 
-                    this.handle.Close();
-                    this.handle = null;
+                        this.handle.Close();
+                        this.handle = null;
 
-                    this.disposedValue = true;
+                        this.disposedValue = true;
+                    }
                 }
             }
         }
