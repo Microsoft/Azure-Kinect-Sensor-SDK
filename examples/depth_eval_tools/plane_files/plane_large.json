@@ -1,0 +1,20 @@
+{
+"target": "charuco_large",
+"type": "charuco",
+"shapes": [
+{
+"shape": "charuco",
+"squares_x": 14,
+"squares_y": 9,
+"square_length": 80,
+"marker_length": 60,
+"margin_size": 40,
+"width": 1200,
+"height": 800,
+"x": -40,
+"y": -40,
+"dpi_factor": 5,
+"aruco_dict_name": 6
+}
+]
+}

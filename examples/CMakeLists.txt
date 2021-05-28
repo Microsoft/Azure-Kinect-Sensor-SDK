@@ -20,6 +20,7 @@ endif ()
 if (OpenCV_FOUND)
     add_subdirectory(green_screen)
     add_subdirectory(opencv_compatibility)
+	add_subdirectory(depth_eval_tools)
 
     if ("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
         file(COPY ${OpenCV_DIR}/../bin/ DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} FILES_MATCHING PATTERN "*.dll")
