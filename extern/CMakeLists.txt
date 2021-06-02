@@ -56,6 +56,14 @@ endif()
 # NEW is the default for this policy except when cmake_minimum_required is
 # lower than CMake 3.3
 set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
+# Set default policies for CMP0064 to NEW
+# It will suppress the CMake Warnings that occurs at dependences. 
+# Related: libjpeg-turbo
+set(CMAKE_POLICY_DEFAULT_CMP0064 NEW)
+# Set default policies for CMP0048 to NEW
+# It will suppress the CMake Warnings that occurs at dependences.
+# Related: azure_c_shared (azure-macro-utils-c, umock-c), libjpeg-turbo
+set(CMAKE_POLICY_DEFAULT_CMP0048 NEW)
 
 add_subdirectory(azure_c_shared)
 add_subdirectory(cjson)
