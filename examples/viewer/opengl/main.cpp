@@ -105,7 +105,7 @@ int main()
                 // If you want to use one of the other modes, you have to do the conversion
                 // yourself.
                 //
-                colorTexture.Update(reinterpret_cast<const BgraPixel *>(colorImage.get_buffer()));
+                colorTexture.Update(colorImage.get_buffer<const BgraPixel>());
             }
 
             // Show the windows
@@ -154,7 +154,7 @@ void ColorizeDepthImage(const k4a::image &depthImage,
 
     buffer->resize(static_cast<size_t>(width * height));
 
-    const uint16_t *depthData = reinterpret_cast<const uint16_t *>(depthImage.get_buffer());
+    const uint16_t *depthData = depthImage.get_buffer<const uint16_t>();
     for (int h = 0; h < height; ++h)
     {
         for (int w = 0; w < width; ++w)

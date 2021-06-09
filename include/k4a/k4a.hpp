@@ -262,18 +262,20 @@ public:
      *
      * \sa k4a_image_get_buffer
      */
-    uint8_t *get_buffer() noexcept
+    template<typename T = uint8_t>
+    T *get_buffer() noexcept
     {
-        return k4a_image_get_buffer(m_handle);
+        return reinterpret_cast<T*>(k4a_image_get_buffer(m_handle));
     }
 
     /** Get the image buffer
      *
      * \sa k4a_image_get_buffer
      */
-    const uint8_t *get_buffer() const noexcept
+    template<typename T = uint8_t>
+    const T *get_buffer() const noexcept
     {
-        return k4a_image_get_buffer(m_handle);
+        return reinterpret_cast<T*>(k4a_image_get_buffer(m_handle));
     }
 
     /** Get the image buffer size in bytes
