@@ -370,36 +370,40 @@ public:
      *
      * \sa k4a_image_set_device_timestamp_usec
      */
-    void set_timestamp(std::chrono::microseconds timestamp) noexcept
+    image& set_timestamp(std::chrono::microseconds timestamp) noexcept
     {
         k4a_image_set_device_timestamp_usec(m_handle, internal::clamp_cast<uint64_t>(timestamp.count()));
+        return *this;
     }
 
     /** Set the image's exposure time in microseconds (color images only)
      *
      * \sa k4a_image_set_exposure_time_usec
      */
-    void set_exposure_time(std::chrono::microseconds exposure) noexcept
+    image& set_exposure_time(std::chrono::microseconds exposure) noexcept
     {
         k4a_image_set_exposure_usec(m_handle, internal::clamp_cast<uint64_t>(exposure.count()));
+        return *this;
     }
 
     /** Set the white balance of the image (color images only)
      *
      * \sa k4a_image_set_white_balance
      */
-    void set_white_balance(uint32_t white_balance) noexcept
+    image& set_white_balance(uint32_t white_balance) noexcept
     {
         k4a_image_set_white_balance(m_handle, white_balance);
+        return *this;
     }
 
     /** Set the ISO speed of the image (color images only)
      *
      * \sa k4a_image_set_iso_speed
      */
-    void set_iso_speed(uint32_t iso_speed) noexcept
+    image& set_iso_speed(uint32_t iso_speed) noexcept
     {
         k4a_image_set_iso_speed(m_handle, iso_speed);
+        return *this;
     }
 
 private:
@@ -576,36 +580,40 @@ public:
      *
      * \sa k4a_capture_set_color_image
      */
-    void set_color_image(const image &color_image) noexcept
+    capture& set_color_image(const image &color_image) noexcept
     {
         k4a_capture_set_color_image(m_handle, color_image.handle());
+        return *this;
     }
 
     /** Set / add a depth image to the capture
      *
      * \sa k4a_capture_set_depth_image
      */
-    void set_depth_image(const image &depth_image) noexcept
+    capture& set_depth_image(const image &depth_image) noexcept
     {
         k4a_capture_set_depth_image(m_handle, depth_image.handle());
+        return *this;
     }
 
     /** Set / add an IR image to the capture
      *
      * \sa k4a_capture_set_ir_image
      */
-    void set_ir_image(const image &ir_image) noexcept
+    capture& set_ir_image(const image &ir_image) noexcept
     {
         k4a_capture_set_ir_image(m_handle, ir_image.handle());
+        return *this;
     }
 
     /** Set the temperature associated with the capture in Celsius.
      *
      * \sa k4a_capture_set_temperature_c
      */
-    void set_temperature_c(float temperature_c) noexcept
+    capture& set_temperature_c(float temperature_c) noexcept
     {
         k4a_capture_set_temperature_c(m_handle, temperature_c);
+        return *this;
     }
 
     /** Get temperature (in Celsius) associated with the capture.
